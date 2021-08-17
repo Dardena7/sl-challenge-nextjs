@@ -22,7 +22,7 @@ const HomePage = (props) => {
 
                 <section className='agency-details'>
 
-                    <Image src='/jedi-logo.jpg' width={200} height={200} />
+                    <Image src='/jedi-logo.jpg' width={200} height={200} alt='jedi order logo'/>
 
                     <p className='page-description'>
                         <strong>Search</strong> and <strong>Add</strong> Jedi Agencies !

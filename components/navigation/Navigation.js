@@ -1,33 +1,26 @@
+import {Nav, Navbar, Container} from "react-bootstrap";
 import Link from "next/link";
 
-const Navigation = (props) => {
+const Navigation = () => {
     return (
-
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-            <div className="container-fluid">
+        <Navbar bg="light" expand="lg">
+            <Container>
                 <Link href="/" passHref>
-                    <a className="navbar-brand star-wars-font">Yoda Agency</a>
+                    <Navbar.Brand className={'star-wars-font'}>Yoda Agency</Navbar.Brand>
                 </Link>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link href="/agencies" passHref>
-                                <a className="nav-link">Agencies</a>
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link href="/agencies/add" passHref>
-                                <a className="nav-link">Add agency</a>
-                            </Link>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+                <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        <Link href="/agencies" passHref>
+                            <Nav.Link>Agencies</Nav.Link>
+                        </Link>
+                        <Link href="/agencies/add" passHref>
+                            <Nav.Link>Add agency</Nav.Link>
+                        </Link>
+                    </Nav>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
 )
     ;
 }

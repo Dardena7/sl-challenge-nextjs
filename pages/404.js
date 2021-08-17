@@ -22,7 +22,7 @@ const HomePage = (props) => {
 
                 <section className='agency-details'>
 
-                    <Image src='/yoda.jpeg' width={200} height={200} />
+                    <Image src='/yoda.jpeg' width={200} height={200} alt='Yoda'/>
 
                     <p className='page-description'>
                         May the force be with you !
