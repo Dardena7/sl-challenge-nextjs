@@ -1,13 +1,13 @@
-import YodaHead from '../components/head/YodaHead';
-import Navigation from '../components/navigation/Navigation';
+import YodaHead from "../components/head/YodaHead";
+import Navigation from "../components/navigation/Navigation";
+import Image from "next/image";
 import Link from "next/link";
-import Image from 'next/image';
 import React from "react";
 
 const HomePage = (props) => {
 
-    const title = "Yoda Agency";
-    const meta_description = "Yoda Agency App with NextJs";
+    const title = "404 Error";
+    const meta_description = "";
 
     return (
         <>
@@ -17,15 +17,15 @@ const HomePage = (props) => {
 
             <main>
                 <h1 className={'star-wars-font'}>
-                    Welcome to Yoda Agency !
+                    404 - Page Not Found
                 </h1>
 
                 <section className='agency-details'>
 
-                    <Image src='/jedi-logo.jpg' width={200} height={200} />
+                    <Image src='/yoda.jpeg' width={200} height={200} />
 
                     <p className='page-description'>
-                        <strong>Search</strong> and <strong>Add</strong> Jedi Agencies !
+                        May the force be with you !
                     </p>
 
                     <div className="btn-wrapper">
