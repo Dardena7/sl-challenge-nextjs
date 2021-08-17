@@ -3,12 +3,22 @@ import YodaHead from "../../components/head/YodaHead";
 import Navigation from "../../components/navigation/Navigation";
 import Link from "next/link";
 import {useRouter} from "next/router";
+import {useState} from "react";
 
 const AddAgencyPage = () => {
 
     const router = useRouter();
 
+    const [disableAdd, setDisableAdd] = useState(false);
+    const [successAdd, setSuccessAdd] = useState(false);
+    const [errorAdd, setErrorAdd] = useState(false);
+
     const addAgency = async (agencyData) => {
+
+        setDisableAdd(true);
+        setSuccessAdd(false);
+        setErrorAdd(false);
+
         const response = await fetch('/api/addAgency', {
             method: 'POST',
             body: JSON.stringify(agencyData),
@@ -17,7 +27,15 @@ const AddAgencyPage = () => {
             }
         });
 
-        await router.push('/agencies');
+        if (response.status === 201) {
+            setSuccessAdd(true);
+            await router.push('/agencies');
+        }
+        else {
+            setErrorAdd(true);
+            setDisableAdd(false);
+        }
+
     };
 
     const title = "Add agency";
@@ -34,7 +52,7 @@ const AddAgencyPage = () => {
                     Add Agency
                 </h1>
                 <div className='container'>
-                    <AddAgency onAddAgency={addAgency}/>
+                    <AddAgency onAddAgency={addAgency} disableAdd={disableAdd} successAdd={successAdd} errorAdd={errorAdd}/>
                     <Link href={"/agencies"}>
                         <button  className='btn btn-light yoda-btn'>Back to agencies</button>
                     </Link>

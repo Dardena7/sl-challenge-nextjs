@@ -6,6 +6,7 @@ import CurrentFilters from '../../components/filter/CurrentFilters';
 import SortBy from '../../components/filter/SortBy';
 import Filter from '../../components/filter/Filter';
 import {useEffect, useState} from 'react';
+import useSWR from "swr";
 
 const AgenciesPage = (props) => {
 
@@ -13,12 +14,12 @@ const AgenciesPage = (props) => {
 
     //Filter
     const getFilteredAgencies = (agencies, filters) => {
-        if (filters.length == 0) {
+        if (filters.length === 0) {
             return agencies;
         }
         return agencies.reduce((filteredAgencies, agency) => {
             return hasAllTags(agency, filters) ? filteredAgencies.concat(agency) : filteredAgencies;
-        },[]);
+        }, []);
     };
 
     const getDistinctFilters = (agencies) => {
@@ -26,7 +27,7 @@ const AgenciesPage = (props) => {
             return allFilters.concat(
                 agency.tags.filter(filter => allFilters.indexOf(filter) < 0)
             );
-        }, []).sort((a,b) => {
+        }, []).sort((a, b) => {
             return a >= b ? 1 : -1;
         });
     };
@@ -45,13 +46,12 @@ const AgenciesPage = (props) => {
 
 
     const updateAvailableFilters = (agencies, currentFilters) => {
-        console.log(currentFilters);
         const newAvailableFilters = getDistinctFilters(agencies).map(filter => {
-                return {
-                    label: filter,
-                    nbArticles: getNbAgencies(filter, agencies),
-                    active: isChecked(filter, currentFilters)
-                }
+            return {
+                label: filter,
+                nbArticles: getNbAgencies(filter, agencies),
+                active: isChecked(filter, currentFilters)
+            }
         });
 
         setAvailableFilters(newAvailableFilters);
@@ -64,13 +64,12 @@ const AgenciesPage = (props) => {
         if (newFilters.indexOf(filter) < 0) {
             newFilters.push(filter);
             setFilters(newFilters);
-        }
-        else {
+        } else {
             newFilters.splice(newFilters.indexOf(filter), 1);
             setFilters(newFilters);
         }
 
-        const filteredAgencies = updateAgenciesList(search,newFilters);
+        const filteredAgencies = updateAgenciesList(agencies, search, newFilters);
         updateAvailableFilters(filteredAgencies, newFilters);
     }
 
@@ -86,18 +85,18 @@ const AgenciesPage = (props) => {
 
         setSearch(search);
 
-        const filteredAgencies = updateAgenciesList(search, filters);
+        const filteredAgencies = updateAgenciesList(agencies, search, filters);
         updateAvailableFilters(filteredAgencies, filters);
     }
 
     const getSearchedAgencies = (agencies, search) => {
         search = search.trim().toLowerCase();
-        if (search == '') {
+        if (search === '') {
             return agencies;
         }
         return agencies.reduce((searchedAgencies, agency) => {
             return containsSearch(agency, search) ? searchedAgencies.concat(agency) : searchedAgencies;
-        },[]);
+        }, []);
     };
 
 
@@ -138,23 +137,20 @@ const AgenciesPage = (props) => {
     }
 
     const sortAgencies = (agencies, sortBy) => {
-        if (sortBy == 'gradeAsc') {
-            return agencies.sort((a,b) => {
+        if (sortBy === 'gradeAsc') {
+            return agencies.sort((a, b) => {
                 return gradeValue(a.grade) < gradeValue(b.grade) ? -1 : 1;
             });
-        }
-        else if (sortBy == 'gradeDesc') {
-            return agencies.sort((a,b) => {
+        } else if (sortBy === 'gradeDesc') {
+            return agencies.sort((a, b) => {
                 return gradeValue(a.grade) >= gradeValue(b.grade) ? -1 : 1;
             });
-        }
-        else if (sortBy == 'nameAsc') {
-            return agencies.sort((a,b) => {
+        } else if (sortBy === 'nameAsc') {
+            return agencies.sort((a, b) => {
                 return a.name < b.name ? -1 : 1;
             });
-        }
-        else if (sortBy == 'nameDesc') {
-            return agencies.sort((a,b) => {
+        } else if (sortBy === 'nameDesc') {
+            return agencies.sort((a, b) => {
                 return a.name >= b.name ? -1 : 1;
             });
         }
@@ -162,12 +158,12 @@ const AgenciesPage = (props) => {
     }
 
     const gradeValue = (grade) => {
-        switch (grade) {
-            case 'Padawan' :
+        switch (grade.toLowerCase()) {
+            case 'padawan' :
                 return 1;
-            case 'Jedi' :
+            case 'jedi' :
                 return 2;
-            case 'Master':
+            case 'master':
                 return 3;
             default:
                 return 0;
@@ -175,7 +171,7 @@ const AgenciesPage = (props) => {
     }
 
 
-    const updateAgenciesList = (search, filters) => {
+    const updateAgenciesList = (agencies, search, filters) => {
         const filteredAgencies = sortAgencies(
             getSearchedAgencies(
                 getFilteredAgencies(agencies, filters)
@@ -191,7 +187,7 @@ const AgenciesPage = (props) => {
     const resetFilters = () => {
         setFilters([]);
         setSearch('');
-        updateAgenciesList('', []);
+        updateAgenciesList(agencies, '', []);
     }
 
 
@@ -204,17 +200,32 @@ const AgenciesPage = (props) => {
     const [filters, setFilters] = useState(Array());
     const [search, setSearch] = useState('');
 
-    const [agencies, setAgencies] = useState(props.agencies);
+    const [agencies, setAgencies] = useState(Array());
 
-    const [filteredAgencies, setFilteredAgencies] = useState([]);
-    const [availableFilters, setAvailableFilters] = useState([]);
+    const [filteredAgencies, setFilteredAgencies] = useState(Array());
+    const [availableFilters, setAvailableFilters] = useState(Array());
 
-    //useEffect
+
+    //Fetching datas
+    const fetcher = async (url) => {
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return res.json();
+    }
+
+
+    const {data} = useSWR('/api/fetchAgencies', fetcher, {initialData: props, revalidateOnMount: true});
 
     useEffect(() => {
-        updateAgenciesList('', []);
-        updateAvailableFilters(agencies, []);
-    }, []);
+        setAgencies(data.agenciesData);
+        updateAgenciesList(data.agenciesData, '', []);
+        updateAvailableFilters(data.agenciesData, []);
+    }, [data]);
 
 
     //Template
@@ -244,10 +255,11 @@ const AgenciesPage = (props) => {
                         <section className='col-md-9'>
                             <div>
                                 <h2>Search : </h2>
-                                <input onChange={(e) => searchAgency(e,filteredAgencies)} type="text" className="form-control" value={search}/>
+                                <input onChange={(e) => searchAgency(e, filteredAgencies)} type="text"
+                                       className="form-control" value={search}/>
                             </div>
                             <hr/>
-                            <CurrentFilters filters={filters} />
+                            <CurrentFilters filters={filters}/>
                             <div>
                                 <button onClick={() => resetFilters()} className='btn btn-danger'>Reset</button>
                             </div>
@@ -255,10 +267,10 @@ const AgenciesPage = (props) => {
                             <SortBy
                                 onSort={sortList}
                                 options={[
-                                    {value:'gradeAsc', label:'Grade Low to High'},
-                                    {value:'gradeDesc', label:'Grade High to Low'},
-                                    {value:'nameAsc', label:'Name A to Z'},
-                                    {value:'nameDesc', label:'Name Z to A'},
+                                    {value: 'gradeAsc', label: 'Grade Low to High'},
+                                    {value: 'gradeDesc', label: 'Grade High to Low'},
+                                    {value: 'nameAsc', label: 'Name A to Z'},
+                                    {value: 'nameDesc', label: 'Name Z to A'},
                                 ]}
                                 value={sortBy}
                             />
@@ -283,7 +295,7 @@ export async function getStaticProps() {
 
     return {
         props: {
-            agencies: agencies.map(agency => ({
+            agenciesData: agencies.map(agency => ({
                 name: agency.name,
                 description: agency.description,
                 grade: agency.grade,

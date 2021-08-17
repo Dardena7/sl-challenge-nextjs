@@ -55,7 +55,7 @@ export async function getStaticPaths(context) {
     client.close();
 
     return {
-        fallback: false,
+        fallback: 'blocking',
         paths: agencies.map((agency) => (
             {
                 params: {

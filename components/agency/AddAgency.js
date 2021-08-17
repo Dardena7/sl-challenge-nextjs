@@ -81,7 +81,9 @@ const AddAgency = (props) => {
                 <label className='star-wars-font'>image : </label>
                 <input type="text" className="form-control" ref={imageInputRef}/>
             </div>
-            <button type="submit" className="btn btn-light star-wars-font">Submit</button>
+            <div className={`alert-success mb-3 ${props.successAdd ? 'd-block' : 'd-none'}`}>Agency added successfully</div>
+            <div className={`alert-danger mb-3 ${props.errorAdd ? 'd-block' : 'd-none'}`}>An error occured while adding agency. Please retry</div>
+            <button type="submit" className="btn btn-light star-wars-font" disabled={props.disableAdd}>Submit</button>
         </form>
     );
 };
