@@ -188,6 +188,7 @@ const AgenciesPage = (props) => {
         setFilters([]);
         setSearch('');
         updateAgenciesList(agencies, '', []);
+        updateAvailableFilters(agencies, []);
     }
 
 
@@ -259,10 +260,7 @@ const AgenciesPage = (props) => {
                                        className="form-control" value={search}/>
                             </div>
                             <hr/>
-                            <CurrentFilters filters={filters}/>
-                            <div>
-                                <button onClick={() => resetFilters()} className='btn btn-danger'>Reset</button>
-                            </div>
+                            <CurrentFilters filters={filters} onReset={resetFilters}/>
                             <hr/>
                             <SortBy
                                 onSort={sortList}
